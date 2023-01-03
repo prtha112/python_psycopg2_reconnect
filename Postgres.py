@@ -55,13 +55,13 @@ class Postgres:
         except (Exception, psycopg2.Error) as error:
             raise error
             
-    def fetchAll(self, data, retry_count = 0):
+    def fetchAll(self, data):
         sqlState = data
         self.execute(data, self._reconnectTries)
         result = self.database_connection.fetchall(sqlState)
         return result
     
-    def fetchOne(self, data, retry_count = 0):
+    def fetchOne(self, data):
         sqlState = data
         self.execute(data, self._reconnectTries)
         result = self.database_connection.fetchone(sqlState)
