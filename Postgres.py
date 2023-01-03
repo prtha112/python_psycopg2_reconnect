@@ -34,8 +34,8 @@ class Postgres:
         conn.autocommit = True
         try:
             self.database_connection = conn.cursor()
-        except psycopg2.Error as e:
-            print(e)
+        except psycopg2.Error as error:
+            raise error
 
     def reset(self):
         if self.database_connection:
