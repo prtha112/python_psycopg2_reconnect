@@ -12,7 +12,6 @@ class Postgres:
     database_query_result = None
 
     _reconnectTries = 5
-    _reconnectIdle = 2
 
     # instance attribute
     def __init__(self, address, dbname, username, password, port):
