@@ -9,8 +9,7 @@ class Postgres:
     database_port = ''
 
     database_connection = None
-    database_query_result = None
-
+    
     _reconnectTries = 5
 
     # instance attribute
@@ -41,18 +40,10 @@ class Postgres:
             self.database_connection.close()
         self.database_connection = None
 
-    def execute(self, data, retry_count = 0, state = "ALL"):
+    def execute(self, data, retry_count = 0):
         sqlState = data
         try:
             self.database_connection.execute(sqlState)
-            if state == "ALL":
-                self.database_query_result = self.database_connection.fetchall(sqlState)
-            else if state == "ONE":
-                self.database_query_result = self.database_connection.fetchone(sqlState)
-            else if state == "EDIT":
-                self.database_query_result = None
-            else:
-                raise "State query no match"
         except psycopg2.OperationalError as error:
             if retry_count >= self._reconnectTries:
                 raise error
@@ -66,10 +57,12 @@ class Postgres:
             
     def fetchAll(self, data, retry_count = 0):
         sqlState = data
-        self.execute(data, self._reconnectTries, "ALL")
-        return self.database_query_result
+        self.execute(data, self._reconnectTries)
+        result = self.database_connection.fetchall(sqlState)
+        return result
     
     def fetchOne(self, data, retry_count = 0):
         sqlState = data
-        self.execute(data, self._reconnectTries, "ONE")
-        return self.database_query_result
+        self.execute(data, self._reconnectTries)
+        result = self.database_connection.fetchone(sqlState)
+        return result
