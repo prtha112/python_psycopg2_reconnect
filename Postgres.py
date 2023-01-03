@@ -41,13 +41,16 @@ class Postgres:
             self.database_connection.close()
         self.database_connection = None
 
-    def execute(self, data):
+    def execute(self, data, retry_count = 0):
         sqlState = data
         try:
             self.database_connection.execute(sqlState)
         except psycopg2.OperationalError as error:
-            self.reset()
-            self.connect()
-            self.execute(sqlState)
+            if retry_count >= self._reconnectTries:
+                raise error
+            else:
+                self.reset()
+                self.connect()
+                self.execute(sqlState, retry_count)
         except (Exception, psycopg2.Error) as error:
             raise error
