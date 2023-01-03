@@ -57,12 +57,12 @@ class Postgres:
             
     def fetchAll(self, data):
         sqlState = data
-        self.execute(data, self._reconnectTries)
-        result = self.database_connection.fetchall(sqlState)
+        self.execute(sqlState, self._reconnectTries)
+        result = self.database_connection.fetchall()
         return result
     
     def fetchOne(self, data):
         sqlState = data
-        self.execute(data, self._reconnectTries)
-        result = self.database_connection.fetchone(sqlState)
+        self.execute(sqlState, self._reconnectTries)
+        result = self.database_connection.fetchone()
         return result
