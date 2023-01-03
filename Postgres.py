@@ -41,16 +41,35 @@ class Postgres:
             self.database_connection.close()
         self.database_connection = None
 
-    def execute(self, data, retry_count = 0):
+    def execute(self, data, retry_count = 0, state = "ALL"):
         sqlState = data
         try:
             self.database_connection.execute(sqlState)
+            if state == "ALL":
+                self.database_query_result = self.database_connection.fetchall(sqlState)
+            else if state == "ONE":
+                self.database_query_result = self.database_connection.fetchone(sqlState)
+            else if state == "EDIT":
+                self.database_query_result = None
+            else:
+                raise "State query no match"
         except psycopg2.OperationalError as error:
             if retry_count >= self._reconnectTries:
                 raise error
             else:
+                self._reconnectTries = self._reconnectTries + 1
                 self.reset()
                 self.connect()
                 self.execute(sqlState, retry_count)
         except (Exception, psycopg2.Error) as error:
             raise error
+            
+    def fetchAll(self, data, retry_count = 0):
+        sqlState = data
+        self.execute(data, self._reconnectTries, "ALL")
+        return self.database_query_result
+    
+    def fetchOne(self, data, retry_count = 0):
+        sqlState = data
+        self.execute(data, self._reconnectTries, "ONE")
+        return self.database_query_result
