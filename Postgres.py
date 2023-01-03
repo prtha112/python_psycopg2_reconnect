@@ -49,6 +49,6 @@ class Postgres:
         except psycopg2.OperationalError as error:
             self.reset()
             self.connect()
-            self.database_connection.execute(sqlState)
+            self.execute(sqlState)
         except (Exception, psycopg2.Error) as error:
             raise error
